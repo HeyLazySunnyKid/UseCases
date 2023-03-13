@@ -1,0 +1,63 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: keepalived-server-1
+    image: ubuntu:focal
+    dockerfile: Dockerfile.j2
+    priveleged: true
+    capabilities:
+      - NET_ADMIN
+    networks:
+      - name: PublicNet
+        ipv4_address: 192.168.64.10 
+      - name: PrivateNet
+        ipv4_address: 192.168.100.10
+    comparisons:
+      networks: strict
+    network_mode: "PrivateNet"
+    docker_networks:
+      - name: PublicNet
+        ipam_config:
+          - subnet: "192.168.64.0/24"
+            gateway: "192.168.64.1"
+      - name: PrivateNet
+        internal: yes
+        ipam_config:
+          - subnet: "192.168.100.0/24"
+            # gateway: "192.168.100.1"
+
+  - name: keepalived-server-2
+    image: ubuntu:focal
+    dockerfile: Dockerfile.j2
+    priveleged: true
+    capabilities:
+      - NET_ADMIN
+    networks:
+      - name: PublicNet
+        ipv4_address: 192.168.64.11 
+      - name: PrivateNet
+        ipv4_address: 192.168.100.11 
+    comparisons:
+      networks: strict
+    network_mode: "PrivateNet"
+
+  - name: keepalived-client-1
+    image: ubuntu:focal
+    dockerfile: Dockerfile.j2
+    priveleged: true
+    capabilities:
+      - NET_ADMIN
+    networks:
+      - name: PrivateNet
+        ipv4_address: 192.168.100.12 
+    comparisons:
+      networks: strict
+    network_mode: "PrivateNet"
+
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

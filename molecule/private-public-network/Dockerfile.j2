@@ -1,0 +1,14 @@
+FROM {{ item.image }}
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Moscow
+
+# Required for all
+RUN apt-get update && \
+    apt-get install -y python3 && \
+    apt-get install -y sudo && \
+    rm -rf /var/lib/apt/lists/*
+
+# only now
+RUN apt-get update && \
+    apt-get install -y curl iproute2 iputils-ping
